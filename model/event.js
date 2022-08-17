@@ -1,4 +1,4 @@
-const event = {
+module.exports  = {
     type :  String,
     name : String,
     tagLine : String,
@@ -9,16 +9,12 @@ const event = {
     rigor_rank : String,
     attendees : [String],
     image : String,
-    schedule : {
-        from : Date,
-        to : Date
-    }
-
-    
+    from : Date,
+    to : Date
 
 }
 
 
 
 
-module.exports = event;
+

@@ -7,34 +7,38 @@ const collection =require("../connection");
 module.exports = class events{
 
     static async get_events(req,res){
+
          
         try {
-            const result = await collection.find({}).toArray();
-            res.send(result);
+            if(req.query.id){
+                 const result = await collection.find({ _id: new mongodb.ObjectId(req.query.id) }).toArray();
+                 res.send(result);
+            }else{
+                var limit = parseInt(req.query.limit) || 2;
+                var page = parseInt(req.query.page) || 0;
+                 const result = await collection.find({}).sort({"from" :-1}).skip(page * limit).limit(limit).toArray();
+                 res.send(result);
+            }
         } catch (error) {
             res.status(500).json({error: error});
+            console.log(error)
+
         }
     }
 
 
     static async add_events(req,res){
-        const event = {
-            type :  req.body.type,
-            name : req.body.name,
-            tagLine : req.body.tagLine,
-            description : req.body.description,
-            moderator : req.body.moderator,
-            category : req.body.category,
-            sub_category : req.body.sub_category,
-            rigor_rank : req.body.rigor_rank,
-            attendees : [String],
-            image : String,
-            schedule : {
-                from : Date,
-                to : Date
-            }
-        }
+            
+            
         try {
+            event.type =  req.body.type;
+            event.name = req.body.name;
+            event.tagLine = req.body.tagLine;
+            event.description = req.body.description;
+            event.moderator = req.body.moderator;
+            event.category = req.body.category;
+            event.sub_category = req.body.sub_category;
+            event.rigor_rank = req.body.rigor_rank;
             if(req.body.date && req.body.from_time && req.body.to_time){
                 const day = req.body.date;
                 const from = req.body.from_time;
@@ -57,8 +61,8 @@ module.exports = class events{
 
                 dateTime_to.setHours(to.split(':')[0]);
                 dateTime_to.setMinutes(to.split(':')[1]);
-                event.schedule.from = dateTime_from;
-                event.schedule.to = dateTime_to;
+                event.from = dateTime_from;
+                event.to = dateTime_to;
             }
             if(req.file){
                 event.image = req.file.path;
